@@ -1,5 +1,5 @@
-import sys
-sys.path.append('/home/kopi/stuff/annotator/ffmpeg-4.2.1')
+# import sys
+# sys.path.append('/home/kopi/stuff/annotator/ffmpeg-4.2.1')
 
 
 
@@ -8,7 +8,7 @@ import time
 import argparse
 import platform
 import subprocess
-from os.path import isfile, join
+from os.path import isfile, join, isdir
 from os import listdir
 from PIL import Image
 from PIL import ImageDraw
@@ -17,8 +17,16 @@ import cv2
 from os.path import isfile, join
 from os import listdir
 import os
-
+import shutil
+import numpy as np
 import  ffmpeg 
+
+def create_dir(path):
+    try:
+        os.mkdir(path)
+    except FileExistsError:
+        shutil.rmtree(path)
+        os.mkdir(path)
 
 def check_rotation(path_video_file):
     # this returns meta-data of the video file in form of a dictionary
@@ -42,29 +50,35 @@ def check_rotation(path_video_file):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--root', type=str)
-parser.add_argument('--frame', type=int, default=60)
+parser.add_argument('--batch_name', type=str)
+parser.add_argument('--frame', type=int, default=300)
 args = parser.parse_args()
 
 
+output_root = os.path.join("/home/kopi/local_git/dataset/processed", args.batch_name)
+tmp_day = os.path.join(output_root, "tmp_day")
+tmp_night = os.path.join(output_root, "tmp_night")
 
-images_folder = os.path.join(args.root, "raw_images")
+create_dir(tmp_day)
+create_dir(tmp_night)
 
-for category in ["cloudy", "dark", "sunny"]:
-#for category in ["rainy", "rainy2"]:
-    videos_folder = os.path.join(args.root, "raw_footage", category)
+
+categories = [f for f in listdir(args.root) if isdir(join(args.root, f))]
+
+
+index = 0
+for category in categories:
+    videos_folder = os.path.join(args.root, category)
     videos_names = [f for f in listdir(videos_folder) if isfile(join(videos_folder, f))]
 
 
 
-    start_index = len([f for f in listdir(images_folder) if isfile(join(images_folder, f))])
-    created_images = 0
     for video in videos_names:
         video_path = os.path.join(videos_folder, video)
 
         #print(video_path)
         vidcap = cv2.VideoCapture(video_path)
         rotateCode = check_rotation(video_path)
-
         i = 0
         success = True
         while success:
@@ -79,8 +93,14 @@ for category in ["cloudy", "dark", "sunny"]:
             if i % args.frame == 0:
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  
                 image = Image.fromarray(img)
-                image_name = "my_" + str(start_index + created_images).zfill(6) + ".jpg";
-                image.save(images_folder + '/' + image_name)
-                created_images += 1
+                image_name = "my_" + str(index).zfill(6) + ".jpg"
+
+                gray_image = Image.fromarray(img).convert('LA')
+                gray_array = np.asarray(gray_image)
+                if np.mean(gray_array) > 164:
+                    image.save(tmp_day + '/' + image_name)
+                else:
+                    image.save(tmp_night + '/' + image_name)
+                index += 1
 
 
