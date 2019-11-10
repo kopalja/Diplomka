@@ -1,8 +1,20 @@
+#!/bin/bash
 
+### USAGE
+# One parameter (path to raw_footage folder)
+# Creates new folder in ~/local_git/dataset/processed.
 
-# One parameter
-# path to raw_footage folder
+# CREATED FOLDER STRUCTURE
+#           {BATCH_name}
+#           /         \
+#         day        night
+#      /  |  \      /  |  \
+#     d   i  x     d   i   x
+###############################
 
+# Example ./main /home/kopi/local_git/dataset/raw_footage/batch_2
+
+cd "/home/kopi/diplomka/training/dataset_tools/process_video"
 
 OUTPUT_ROOT="/home/kopi/local_git/dataset/processed/$(basename $1)"
 
