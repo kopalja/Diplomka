@@ -13,7 +13,7 @@ usage()
     echo "Usage: sysinfo_page [[-n name of new dataset ], [-t type of new dataset {all, day, night}], [-b list of included batches]]"
     exit
 }
-cd "/home/kopi/diplomka/training/dataset_tools/export"
+cd "${PROJECT_ROOT}/training/dataset_tools/export"
 
 # parse arguments
 while [ "$1" != "" ]; do
@@ -51,8 +51,8 @@ while [ "$1" != "" ]; do
 done
 
 
-PROCESSED_DIR="/home/kopi/local_git/dataset/processed"
-EXPORTED_DIR="/home/kopi/local_git/dataset/exported"
+PROCESSED_DIR="${LOCAL_GIT}/dataset/processed"
+EXPORTED_DIR="${LOCAL_GIT}/dataset/exported"
 
 # Create new empty dataset
 if [ -d "${EXPORTED_DIR}/${NAME}" ]; then rm -Rf ${EXPORTED_DIR}/${NAME}; fi

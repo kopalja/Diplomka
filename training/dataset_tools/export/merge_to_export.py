@@ -4,8 +4,10 @@ from os import listdir
 import os
 import shutil
 import argparse
-from enum import Enum
 
+import sys
+sys.path.insert(0, os.environ['PROJECT_ROOT'])
+from python_tools.Day_night_enum import Data_Type
 
 
 def move_data(src_img, src_xml, dst_img, dst_xml):
@@ -17,35 +19,33 @@ def move_data(src_img, src_xml, dst_img, dst_xml):
         name_index += 1      
 
 
-class Data_Type(Enum):
-    all_ = 'all'
-    day = 'day'
-    night = 'night'
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--processed', type=str)
-parser.add_argument('--exported', type=str)
-parser.add_argument('--type', type=Data_Type, choices=list(Data_Type))
-args = parser.parse_args()
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--processed', type=str)
+    parser.add_argument('--exported', type=str)
+    parser.add_argument('--type', type=Data_Type, choices=list(Data_Type))
+    args = parser.parse_args()
 
 
 
 
-images_day_folder = os.path.join(args.processed, 'day', 'images')
-xmls_day_folder = os.path.join(args.processed, 'day', 'xmls')
+    images_day_folder = os.path.join(args.processed, 'day', 'images')
+    xmls_day_folder = os.path.join(args.processed, 'day', 'xmls')
 
-images_night_folder = os.path.join(args.processed, 'night', 'images')
-xmls_night_folder = os.path.join(args.processed, 'night', 'xmls')
+    images_night_folder = os.path.join(args.processed, 'night', 'images')
+    xmls_night_folder = os.path.join(args.processed, 'night', 'xmls')
 
-dst_images_folder = os.path.join(args.exported, 'images')
-dst_xmls_folder = os.path.join(args.exported, 'annotations', 'xmls')
+    dst_images_folder = os.path.join(args.exported, 'images')
+    dst_xmls_folder = os.path.join(args.exported, 'annotations', 'xmls')
 
 
-# merge files
-if args.type is Data_Type.all_ or args.type is Data_Type.day:
-    move_data(images_day_folder, xmls_day_folder, dst_images_folder, dst_xmls_folder)
+    # merge files
+    if args.type is Data_Type.all_ or args.type is Data_Type.day:
+        move_data(images_day_folder, xmls_day_folder, dst_images_folder, dst_xmls_folder)
 
-if args.type is Data_Type.all_ or args.type is Data_Type.night:
-    move_data(images_night_folder, xmls_night_folder, dst_images_folder, dst_xmls_folder)
+    if args.type is Data_Type.all_ or args.type is Data_Type.night:
+        move_data(images_night_folder, xmls_night_folder, dst_images_folder, dst_xmls_folder)
 
     

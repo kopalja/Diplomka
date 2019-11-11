@@ -12,11 +12,11 @@
 #     d   i  x     d   i   x
 ###############################
 
-# Example ./main /home/kopi/local_git/dataset/raw_footage/batch_2
+# Example ./main ${LOCAL_GIT}/dataset/raw_footage/batch_2
 
-cd "/home/kopi/diplomka/training/dataset_tools/process_video"
+cd "${PROJECT_ROOT}/training/dataset_tools/process_video"
 
-OUTPUT_ROOT="/home/kopi/local_git/dataset/processed/$(basename $1)"
+OUTPUT_ROOT="${LOCAL_GIT}/dataset/processed/$(basename $1)"
 
 if [ -d "${OUTPUT_ROOT}" ]; then
     echo "Processed batch already exist"
@@ -30,7 +30,7 @@ python video_to_images.py --root "$1" --batch_name "$(basename $1)"
 
 
 echo "Labeling images..."
-cd "/home/kopi/local_git/yolo_v3"
+cd "${LOCAL_GIT}/yolo_v3"
 python yolo_video.py --input "${OUTPUT_ROOT}/tmp_day" --output "${OUTPUT_ROOT}/day"
 python yolo_video.py --input "${OUTPUT_ROOT}/tmp_night" --output "${OUTPUT_ROOT}/night"
 

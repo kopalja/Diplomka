@@ -7,7 +7,7 @@
 
 # Example ./main /home/kopi/local_git/dataset/processed/batch_2
 
-cd "/home/kopi/diplomka/training/dataset_tools/regroup"
+cd "${PROJECT_ROOT}/training/dataset_tools/regroup"
 
 mkdir "$1/day/draw_tmp"
 mkdir "$1/day/images_tmp"

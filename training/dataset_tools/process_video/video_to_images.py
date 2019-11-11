@@ -1,7 +1,3 @@
-# import sys
-# sys.path.append('/home/kopi/stuff/annotator/ffmpeg-4.2.1')
-
-
 
 import time
 
@@ -20,13 +16,11 @@ import os
 import shutil
 import numpy as np
 import  ffmpeg 
+import sys
+sys.path.insert(0, os.environ['PROJECT_ROOT'])
+from python_tools.functions import mkdir
 
-def create_dir(path):
-    try:
-        os.mkdir(path)
-    except FileExistsError:
-        shutil.rmtree(path)
-        os.mkdir(path)
+
 
 def check_rotation(path_video_file):
     # this returns meta-data of the video file in form of a dictionary
@@ -48,59 +42,61 @@ def check_rotation(path_video_file):
 
     return rotateCode
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--root', type=str)
-parser.add_argument('--batch_name', type=str)
-parser.add_argument('--frame', type=int, default=300)
-args = parser.parse_args()
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--root', type=str)
+    parser.add_argument('--batch_name', type=str)
+    parser.add_argument('--frame', type=int, default=300)
+    args = parser.parse_args()
 
 
-output_root = os.path.join("/home/kopi/local_git/dataset/processed", args.batch_name)
-tmp_day = os.path.join(output_root, "tmp_day")
-tmp_night = os.path.join(output_root, "tmp_night")
+    output_root = os.path.join(os.environ['LOCAL_GIT'], 'dataset', 'processed', args.batch_name)
+    tmp_day = os.path.join(output_root, "tmp_day")
+    tmp_night = os.path.join(output_root, "tmp_night")
 
-create_dir(tmp_day)
-create_dir(tmp_night)
-
-
-categories = [f for f in listdir(args.root) if isdir(join(args.root, f))]
+    mkdir(tmp_day, force = True)
+    mkdir(tmp_night, force = True)
 
 
-index = 0
-for category in categories:
-    videos_folder = os.path.join(args.root, category)
-    videos_names = [f for f in listdir(videos_folder) if isfile(join(videos_folder, f))]
+    categories = [f for f in listdir(args.root) if isdir(join(args.root, f))]
+
+
+    index = 0
+    for category in categories:
+        videos_folder = os.path.join(args.root, category)
+        videos_names = [f for f in listdir(videos_folder) if isfile(join(videos_folder, f))]
 
 
 
-    for video in videos_names:
-        video_path = os.path.join(videos_folder, video)
+        for video in videos_names:
+            video_path = os.path.join(videos_folder, video)
 
-        #print(video_path)
-        vidcap = cv2.VideoCapture(video_path)
-        rotateCode = check_rotation(video_path)
-        i = 0
-        success = True
-        while success:
-            success, img = vidcap.read()
-            i += 1
-            if not success:
-                break
+            #print(video_path)
+            vidcap = cv2.VideoCapture(video_path)
+            rotateCode = check_rotation(video_path)
+            i = 0
+            success = True
+            while success:
+                success, img = vidcap.read()
+                i += 1
+                if not success:
+                    break
 
-            if rotateCode is not None:
-                img = cv2.rotate(img, rotateCode) 
+                if rotateCode is not None:
+                    img = cv2.rotate(img, rotateCode) 
 
-            if i % args.frame == 0:
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  
-                image = Image.fromarray(img)
-                image_name = "my_" + str(index).zfill(6) + ".jpg"
+                if i % args.frame == 0:
+                    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  
+                    image = Image.fromarray(img)
+                    image_name = "my_" + str(index).zfill(6) + ".jpg"
 
-                gray_image = Image.fromarray(img).convert('LA')
-                gray_array = np.asarray(gray_image)
-                if np.mean(gray_array) > 164:
-                    image.save(tmp_day + '/' + image_name)
-                else:
-                    image.save(tmp_night + '/' + image_name)
-                index += 1
+                    gray_image = Image.fromarray(img).convert('LA')
+                    gray_array = np.asarray(gray_image)
+                    if np.mean(gray_array) > 164:
+                        image.save(tmp_day + '/' + image_name)
+                    else:
+                        image.save(tmp_night + '/' + image_name)
+                    index += 1
 
 
