@@ -58,10 +58,7 @@ for CKPT_DIR in ~/diplomka/training/configs/configs_to_process/*/ ; do
     if [ -d "${OUTPUT_I}" ]; then rm -Rf ${OUTPUT_I}; fi
     mkdir "${OUTPUT_I}"
 
-    #copy model to obj API
-    # cp "${CKPT_DIR}/model.ckpt.data-00000-of-00001" "model.ckpt.data-00000-of-00001"
-    # cp "${CKPT_DIR}/model.ckpt.index" "model.ckpt.index"
-    # cp "${CKPT_DIR}/model.ckpt.meta" "model.ckpt.meta"
+
 
     copy_model_into_obj_api "${CKPT_DIR}" "${ARCH_DIR}"
 
@@ -75,10 +72,7 @@ for CKPT_DIR in ~/diplomka/training/configs/configs_to_process/*/ ; do
         --num_train_steps="${num_training_steps}" \
         --num_eval_steps="${num_eval_steps}"
 
-    #remove model from obj API
-    # rm "model.ckpt.data-00000-of-00001"
-    # rm "model.ckpt.index"
-    # rm "model.ckpt.meta"
+
 
 
     MODEL_DIR="${OUTPUT_I}/model"
