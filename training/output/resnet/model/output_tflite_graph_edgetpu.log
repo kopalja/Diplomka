@@ -17,3 +17,6 @@ RESHAPE                        2          Tensor has unsupported rank (up to 3 i
 RESHAPE                        6          Mapped to Edge TPU
 RESHAPE                        6          More than one subgraph is not supported
 LOGISTIC                       1          More than one subgraph is not supported
+---Additional informations---
+width:          480
+height:          270
