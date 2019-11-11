@@ -33,33 +33,29 @@ copy_model_into_obj_api(){
 }
 
 # set variables 
+DATASET="car_batch1"
 INPUT_TENSORS='normalized_input_image_tensor'
 OUTPUT_TENSORS='TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3'
-HOME="/home/kopi"
-DATASET_DIR="${HOME}/local_git/dataset/car_batch1"
-ARCH_DIR="${HOME}/local_git/architectures"
-ROOT_DIR="${HOME}/diplomka/training"
-OUTPUT_DIR="${HOME}/diplomka/training/output"
 
-cd "${HOME}/local_git/object_detection_api/"
-source "${HOME}/tools/enviroments/tf_gpu/bin/activate"
+cd "${LOCAL_GIT}/object_detection_api/"
+source "/home/kopi/tools/enviroments/tf_gpu/bin/activate"
 
 for CKPT_DIR in ~/diplomka/training/configs/configs_to_process/*/ ; do
 
 
     echo "CONVERTING dataset to TF Record..."
     python object_detection/dataset_tools/create_pet_tf_record2.py \
-        --data_dir="${DATASET_DIR}" \
-        --output_dir="${DATASET_DIR}/../tf_records"
+        --data_dir="${LOCAL_GIT}/dataset/exported/${DATASET}" \
+        --output_dir="${LOCAL_GIT}/dataset/exported/tf_records"
 
     CKPT_NAME="$(basename $CKPT_DIR)"
-    OUTPUT_I="${OUTPUT_DIR}/${CKPT_NAME}"
+    OUTPUT_I="${PROJECT_ROOT}/training/output/${CKPT_NAME}"
     if [ -d "${OUTPUT_I}" ]; then rm -Rf ${OUTPUT_I}; fi
     mkdir "${OUTPUT_I}"
 
 
 
-    copy_model_into_obj_api "${CKPT_DIR}" "${ARCH_DIR}"
+    copy_model_into_obj_api "${CKPT_DIR}" "${HOME}/local_git/architectures"
 
     TRAIN_DIR="${OUTPUT_I}/train"
     echo "Start training..."
