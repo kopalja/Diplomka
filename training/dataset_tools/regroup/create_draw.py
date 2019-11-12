@@ -60,6 +60,7 @@ if __name__ == "__main__":
         image_path = os.path.join(images_folder, image_name)
         xml_path = os.path.join(xmls_folder, image_name[:-4] + '.xml')
 
+        #print(xml_path)
         data = parse_xml_to_dict(xml_path)['annotation']   
         draw = draw_boxes(Image.open(image_path), data)
         dest_draw_path = os.path.join(draw_folder, image_name)
