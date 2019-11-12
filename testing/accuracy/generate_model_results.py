@@ -7,52 +7,44 @@ from os.path import isfile, join
 from PIL import Image
 from PIL import ImageDraw
 import os
-
-
-#engine = DetectionEngine("mobilenet_ssd_v2.tflite")
-#labels = dataset_utils.ReadLabelFile("coco_labels.txt")
-
-engine = DetectionEngine("300_edgetpu.tflite")
-
-#engine = DetectionEngine("retrain_64_edgetpu.tflite")
-
-labels = dataset_utils.ReadLabelFile("vehicles_labels.txt")
+import argparse
+import sys
+sys.path.insert(0, os.environ['PROJECT_ROOT'])
+from python_tools.common import get_files, mkdir
 
 
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model_path', type = str)
+    parser.add_argument('--testing_data', type = str)
+    parser.add_argument('--output_dir', type = str, default = 'model_detection_txts')
+    args = parser.parse_args()
 
-allowed_objects = ["car", "motorcycle", "motorbike", "bus", "truck", "bicycle"]
+    engine = DetectionEngine(args.model_path)
+    labels = dataset_utils.ReadLabelFile("vehicles_labels.txt")
+    allowed_objects = ["car", "motorcycle", "motorbike", "bus", "truck", "bicycle"]
+    images_path = os.path.join(args.testing_data, 'images')
+    mkdir(args.output_dir, force = True)
 
-mypath = "/home/kopi/python_root/Diplomka/mAP_testing"
-images_path = os.path.join(mypath, "images")
-detections_path = os.path.join(mypath, "detection-results")
-onlyfiles = [f for f in listdir(images_path) if isfile(join(images_path, f))]
+    for image_name in get_files(images_path):
+        image = Image.open(os.path.join(images_path, image_name))
 
+        # Run inference.
+        ans = engine.DetectWithImage(image, threshold=0.0, keep_aspect_ratio=False, relative_coord=False, top_k=10)
 
-for image_name in onlyfiles:
-    image_path = os.path.join(images_path, image_name)
-    image = Image.open(image_path)
-    draw = ImageDraw.Draw(image)
-
-    detections_file = open(os.path.join(detections_path, image_name[:-4]  + '.txt'), 'w+')
-    # Run inference.
-    ans = engine.DetectWithImage(image, threshold=0.0, keep_aspect_ratio=False, relative_coord=False, top_k=10)
-
-    if ans:
-        for obj in ans:
-            #print(obj.label_id)
-            if labels[obj.label_id] in allowed_objects:
-                name = labels[obj.label_id]
-                if name == "motorcycle":
-                    name = "motorbike"
-                elif name == "bus":
-                    name = "truck"
-                box = obj.bounding_box.flatten().tolist()
-                detections_file.write("{0} {1} {2} {3} {4} {5} \n".format(name, obj.score, round(box[0]), round(box[1]), round(box[2]), round(box[3])))
-                #draw.rectangle(box, outline='red')
-    #image.show()
-    detections_file.close()
-    #exit()
+        if ans:
+            detections_file = open(os.path.join(args.output_dir, image_name[:-4]  + '.txt'), 'w+')
+            for obj in ans:
+                if labels[obj.label_id] in allowed_objects:
+                    name = labels[obj.label_id]
+                    if name == "motorcycle":
+                        name = "motorbike"
+                    elif name == "bus":
+                        name = "truck"
+                    box = obj.bounding_box.flatten().tolist()
+                    detections_file.write("{0} {1} {2} {3} {4} {5} \n".format(name, obj.score, round(box[0]), round(box[1]), round(box[2]), round(box[3])))
+            detections_file.close()
 
 
 

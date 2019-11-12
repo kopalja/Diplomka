@@ -7,7 +7,7 @@ import argparse
 
 import sys
 sys.path.insert(0, os.environ['PROJECT_ROOT'])
-from python_tools.Day_night_enum import Data_Type
+from python_tools.common import All_Day_Night
 
 
 def move_data(src_img, src_xml, dst_img, dst_xml):
@@ -25,7 +25,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--processed', type=str)
     parser.add_argument('--exported', type=str)
-    parser.add_argument('--type', type=Data_Type, choices=list(Data_Type))
+    parser.add_argument('--type', type=All_Day_Night, choices=list(All_Day_Night))
     args = parser.parse_args()
 
 

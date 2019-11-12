@@ -9,15 +9,16 @@ usage(){
 }
 
 
-MODELS_ROOT_DIR="/home/kopi/diplomka/training/output"
+MODELS_ROOT_DIR="${PROJECT_ROOT}/training/output"
 TYPE="all"
 
-# parse arguments
+# 0. parse arguments
+if [ "$1" = "" ]; then usage; fi
 while [ "$1" != "" ]; do
     case $1 in
         -n | --name )           
             shift
-            MODEL_DIR="${MODELS_ROOT_DIR}/$1"
+            MODEL_DIR="${MODELS_ROOT_DIR}/$1/model"
             if [ ! -d "${MODEL_DIR}" ]; then
                 echo "Folder ${MODEL_DIR} doesn't exist."
                 exit
@@ -40,26 +41,29 @@ while [ "$1" != "" ]; do
     shift
 done
 
-HEIGHT=$(cat "${MODEL_DIR}/model/output_tflite_graph_edgetpu.log" | grep "height:" | sed "s/[a-z]*://g")
-WIDTH=$(cat "${MODEL_DIR}/model/output_tflite_graph_edgetpu.log" | grep "width:" | sed "s/[a-z]*://g")
 
-
-echo ${MODEL_DIR}
-echo ${HEIGHT}
-echo ${WIDTH}
-
-
+# 1. set variables
+HEIGHT=$(cat "${MODEL_DIR}/output_tflite_graph_edgetpu.log" | grep "height:" | sed "s/[a-z]*://g")
+WIDTH=$(cat "${MODEL_DIR}/output_tflite_graph_edgetpu.log" | grep "width:" | sed "s/[a-z]*://g")
+TESTING_DIR=$(echo "${LOCAL_GIT}/testing/exported/${TYPE}_${WIDTH}x${HEIGHT}" | sed 's/ //g')
 
 
 
 # 2. generate groung truth
-
-
-
-
+if [ -d "${TESTING_DIR}" ]; then 
+    echo 'Ground truth already exist'
+else
+    echo 'Generating new ground truth testing set'
+    python generate_ground_truth.py --type ${TYPE} --width ${WIDTH} --height ${HEIGHT}
+fi
 
 
 
 # 3. generate model results
+python generate_model_results.py \
+    --model_path="${MODEL_DIR}/output_tflite_graph_edgetpu.tflite" \
+    --testing_data="${TESTING_DIR}"
+
 
 # 4. evaluate model results
+python evaluate_results.py

@@ -11,7 +11,7 @@ import tensorflow as tf
 from lxml import etree
 import sys
 sys.path.insert(0, os.environ['PROJECT_ROOT'])
-from python_tools.functions import recursive_parse_xml_to_dict
+from python_tools.common import parse_xml_to_dict
 
 
 
@@ -73,10 +73,7 @@ if __name__ == "__main__":
             draw_path = os.path.join(draw_folder, xml_name[:-4] + '.xml')
             xml_path = os.path.join(xmls_folder, xml_name)
 
-            with tf.gfile.GFile(xml_path, 'r') as fid:
-                xml_str = fid.read()
-            xml = etree.fromstring(xml_str)
-            data = recursive_parse_xml_to_dict(xml)['annotation']   
+            data = parse_xml_to_dict(xml_path)['annotation']   
             if check_validation(data) == False:
                 os.remove(draw_folder)
 

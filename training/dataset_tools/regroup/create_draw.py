@@ -8,12 +8,10 @@ import argparse
 import numpy as np
 from PIL import Image, ImageFont, ImageDraw
 
-import tensorflow as tf
-from lxml import etree
 
 import sys
 sys.path.insert(0, os.environ['PROJECT_ROOT'])
-from python_tools.functions import recursive_parse_xml_to_dict
+from python_tools.common import parse_xml_to_dict
 
 colors = {
     "car": "red",
@@ -62,10 +60,7 @@ if __name__ == "__main__":
         image_path = os.path.join(images_folder, image_name)
         xml_path = os.path.join(xmls_folder, image_name[:-4] + '.xml')
 
-        with tf.gfile.GFile(xml_path, 'r') as fid:
-            xml_str = fid.read()
-        xml = etree.fromstring(xml_str)
-        data = recursive_parse_xml_to_dict(xml)['annotation']   
+        data = parse_xml_to_dict(xml_path)['annotation']   
         draw = draw_boxes(Image.open(image_path), data)
         dest_draw_path = os.path.join(draw_folder, image_name)
         draw.save(dest_draw_path, "JPEG")

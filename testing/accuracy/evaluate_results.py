@@ -12,6 +12,7 @@ import numpy as np
 MINOVERLAP = 0.5 # default value (defined in the PASCAL VOC2012 challenge)
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--ground_truth', type = str)
 parser.add_argument('-na', '--no-animation', help="no animation is shown.", action="store_true")
 parser.add_argument('-np', '--no-plot', help="no plot is shown.", action="store_true")
 parser.add_argument('-q', '--quiet', help="minimalistic console output.", action="store_true")
@@ -44,8 +45,11 @@ if args.set_class_iou is not None:
 # make sure that the cwd() is the location of the python script (so that every path makes sense)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-GT_PATH = os.path.join(os.getcwd(), 'ground-truth')
-DR_PATH = os.path.join(os.getcwd(), 'detection-results')
+# GT_PATH = os.path.join(os.getcwd(), 'ground-truth')
+# DR_PATH = os.path.join(os.getcwd(), 'detection-results')
+GT_PATH = os.path.join(args.ground_truth, 'txts')
+DR_PATH = os.path.join(os.getcwd(), 'model_detection_txts')
+
 # if there are no images then no animation can be shown
 IMG_PATH = os.path.join(os.getcwd(), 'images')
 if os.path.exists(IMG_PATH): 

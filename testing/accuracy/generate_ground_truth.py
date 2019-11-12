@@ -13,62 +13,71 @@ import os
 
 import sys
 sys.path.insert(0, os.environ['PROJECT_ROOT'])
+from python_tools.common import mkdir, All_Day_Night, get_files, parse_xml_to_dict
 
 
+def resize_and_copy_images(src_folder, dst_folder, width, height):
+    for image_name in get_files(src_folder):
+        image_path = os.path.join(src_folder, image_name)
+        im = Image.open(image_path)
+        im.thumbnail((width, height), Image.ANTIALIAS)
+        im.save(os.path.join(dst_folder, image_name), "JPEG")
 
-from tools.Day_night_enum import Data_Type
 
+def generate_txts(src_folder, dst_folder, width, height):
+    # private function
+    def rescale(pos, or_size, new_size):
+        return int((int(pos) / or_size) * new_size)
+
+    for xml_name in get_files(src_folder):
+        detections_file = open(os.path.join(dst_folder, xml_name[:-4]  + '.txt'), 'w+')
+        data = parse_xml_to_dict(os.path.join(src_folder, xml_name))['annotation']
+
+        or_width, or_height = int(data['size']['width']), int(data['size']['height'])
+        for obj in data['object']:
+            xmin = rescale(obj['bndbox']['xmin'], or_width, width)
+            ymin = rescale(obj['bndbox']['ymin'], or_height, height)
+            xmax = rescale(obj['bndbox']['xmax'], or_width, width)
+            ymax = rescale(obj['bndbox']['ymax'], or_height, height)
+            detections_file.write("{0} {1} {2} {3} {4} \n".format(obj['name'], xmin, ymin, xmax, ymax))
+        detections_file.close()
+            
 
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--processed', type=str)
-    parser.add_argument('--ex', type=str)
-    parser.add_argument('--type', type=Data_Type, choices=list(Data_Type))
+    parser.add_argument('--type', type = All_Day_Night, choices=list(All_Day_Night))
+    parser.add_argument('--width', type = int)
+    parser.add_argument('--height', type = int)
     args = parser.parse_args()
-    print(args.ex)
-    exit()
 
-
-    engine = DetectionEngine("300_edgetpu.tflite")
-
-    #engine = DetectionEngine("retrain_64_edgetpu.tflite")
-
-    labels = dataset_utils.ReadLabelFile("vehicles_labels.txt")
+    testing_name = args.type.value + '_' + str(args.width) + 'x' + str(args.height)
+    testing_folder = os.path.join(os.environ['LOCAL_GIT'], 'testing/exported', testing_name)
 
 
 
+    # prepare testing tree
+    dst_images_folder = os.path.join(testing_folder, 'images')
+    dst_txts_folder = os.path.join(testing_folder, 'txts')
+    mkdir(testing_folder)
+    mkdir(dst_images_folder)
+    mkdir(dst_txts_folder)
 
-    allowed_objects = ["car", "motorcycle", "motorbike", "bus", "truck", "bicycle"]
+    # copy images
+    src_data_folder = os.path.join(os.environ['LOCAL_GIT'], 'testing/data')
 
-    mypath = "/home/kopi/python_root/Diplomka/mAP_testing"
-    images_path = os.path.join(mypath, "images")
-    detections_path = os.path.join(mypath, "detection-results")
-    onlyfiles = [f for f in listdir(images_path) if isfile(join(images_path, f))]
+    if args.type is All_Day_Night.all_ or args.type is All_Day_Night.day:
+        resize_and_copy_images(os.path.join(src_data_folder, 'day', 'images'), dst_images_folder, args.width, args.height)
+        generate_txts(os.path.join(src_data_folder, 'day', 'xmls'), dst_txts_folder, args.width, args.height)
 
 
-    for image_name in onlyfiles:
-        image_path = os.path.join(images_path, image_name)
-        image = Image.open(image_path)
-        draw = ImageDraw.Draw(image)
+    if args.type is All_Day_Night.all_ or args.type is All_Day_Night.night:
+        resize_and_copy_images(os.path.join(src_data_folder, 'night', 'images'), dst_images_folder, args.width, args.height)
+        generate_txts(os.path.join(src_data_folder, 'night', 'xmls'), dst_txts_folder, args.width, args.height)
 
-        detections_file = open(os.path.join(detections_path, image_name[:-4]  + '.txt'), 'w+')
-        # Run inference.
-        ans = engine.DetectWithImage(image, threshold=0.0, keep_aspect_ratio=False, relative_coord=False, top_k=10)
 
-        if ans:
-            for obj in ans:
-                #print(obj.label_id)
-                if labels[obj.label_id] in allowed_objects:
-                    name = labels[obj.label_id]
-                    if name == "motorcycle":
-                        name = "motorbike"
-                    elif name == "bus":
-                        name = "truck"
-                    box = obj.bounding_box.flatten().tolist()
-                    detections_file.write("{0} {1} {2} {3} {4} {5} \n".format(name, obj.score, round(box[0]), round(box[1]), round(box[2]), round(box[3])))
-                    #draw.rectangle(box, outline='red')
-        #image.show()
-        detections_file.close()
-        #exit()
+
+
+
+
