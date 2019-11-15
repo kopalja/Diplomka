@@ -33,12 +33,12 @@ copy_model_into_obj_api(){
 }
 
 # set variables 
-DATASET="car_batch1"
+DATASET="batch_1_day"
 INPUT_TENSORS='normalized_input_image_tensor'
 OUTPUT_TENSORS='TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3'
 
 cd "${LOCAL_GIT}/object_detection_api/"
-source "/home/kopi/tools/enviroments/tf_gpu/bin/activate"
+#source "/home/kopi/tools/enviroments/tf_gpu/bin/activate"
 
 for CKPT_DIR in ~/diplomka/training/configs/configs_to_process/*/ ; do
 

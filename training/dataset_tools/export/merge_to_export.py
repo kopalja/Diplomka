@@ -42,10 +42,10 @@ if __name__ == "__main__":
 
 
     # merge files
-    if args.type is Data_Type.all_ or args.type is Data_Type.day:
+    if args.type is All_Day_Night.all_ or args.type is All_Day_Night.day:
         move_data(images_day_folder, xmls_day_folder, dst_images_folder, dst_xmls_folder)
 
-    if args.type is Data_Type.all_ or args.type is Data_Type.night:
+    if args.type is All_Day_Night.all_ or args.type is All_Day_Night.night:
         move_data(images_night_folder, xmls_night_folder, dst_images_folder, dst_xmls_folder)
 
     
