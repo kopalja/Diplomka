@@ -3,7 +3,7 @@
 # Exit script on error.
 set -e
 # Echo each command, easier for debugging.
-#set -x
+set -x
 
 # keep only tensorboard data
 delete_train_files(){   
@@ -48,6 +48,8 @@ for CKPT_DIR in ~/diplomka/training/configs/configs_to_process/*/ ; do
         --data_dir="${LOCAL_GIT}/dataset/exported/${DATASET}" \
         --output_dir="${LOCAL_GIT}/dataset/exported/tf_records"
 
+    echo "tf records done"
+
     CKPT_NAME="$(basename $CKPT_DIR)"
     OUTPUT_I="${PROJECT_ROOT}/training/output/${CKPT_NAME}"
     if [ -d "${OUTPUT_I}" ]; then rm -Rf ${OUTPUT_I}; fi
@@ -59,7 +61,7 @@ for CKPT_DIR in ~/diplomka/training/configs/configs_to_process/*/ ; do
 
     TRAIN_DIR="${OUTPUT_I}/train"
     echo "Start training..."
-    num_training_steps=2
+    num_training_steps=11000
     num_eval_steps=2000
     python object_detection/model_main.py \
         --pipeline_config_path="${CKPT_DIR}/pipeline.config" \
