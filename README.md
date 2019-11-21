@@ -33,6 +33,8 @@ To run this project locali you have to also clone second repositori named LOCAL_
 
 ```
 export LOCAL_GIT=<path to LOCAL_GIT on your pc>
+export PROJECT_ROOT=<path to cloned repository>
+
 ```
 
 ### Prerequisites
