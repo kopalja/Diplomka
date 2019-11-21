@@ -4,95 +4,44 @@ This project is for retraining mobile object detection architectures such as mob
 The main project is divided into two parts **Training** and **Testing**.
 
 
-### Training
+## Training
 Constains pipeline to get from raw footage(videos of cars) to retrained model. 
+Its divided into three parts **Dataset tools**, **Configs** and **Output**.
 
-#### dsdssds
-ahoj
+#### Dataset tools
+Dataset tools is responsible for creating dataset on which we can perform training
+
+#### Configs
+Configs contains user specified configurations of model architecture and training configuration.
+
+### Output
+Ouput is where traing results are saved. For each configuration contains both final model and traing events(for tensorboard)
+
+
+## Testing
+Testing part is diveded into two parts **Accuracy** and **Speed**
+**Speed** part is inteded to be performed primary on embeded devices to test model speed on restricted hardware recourses.
+While **Accuracy** is meant to be performed on desktop pc, which containes large testing dataset.
 
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+To keep this repositori small it does not contains any large files such as models architectures or any kind of dataset.
+However it contains only tools which operates with those large files.
+
+To run this project locali you have to also clone second repositori named LOCAL_GIT from here(not available yet) and create system variable.
+
+```
+export LOCAL_GIT=<path to LOCAL_GIT on your pc>
+```
 
 ### Prerequisites
 
-Prerequisites for running are 
+Prerequisites for running are:
 
 ```
 Tensorflow Object Detection API
 ffmpeg
 ```
 
-### Installing
-
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
-## Authors
-
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
 
