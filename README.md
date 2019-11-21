@@ -1,6 +1,7 @@
 # Diplomka
 
-This project is for retraining mobile object detection architectures such as mobilenets on a custom dataset. Included scripts makes it easy to prepare datasets with different image resolutions, number of samples and various samples types(day, night, both).
+This project is for retraining mobile object detection architectures such as mobilenets on a custom dataset. Included scripts makes it easy to prepare datasets with different image resolutions, number of samples and various types(day, night, both).
+The main project is divided into two parts **Training** and **Testing**.
 
 
 
