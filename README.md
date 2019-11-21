@@ -4,6 +4,12 @@ This project is for retraining mobile object detection architectures such as mob
 The main project is divided into two parts **Training** and **Testing**.
 
 
+### Training
+Constains pipeline to get from raw footage(videos of cars) to retrained model. 
+
+# dsdssds
+ahoj
+
 
 ## Getting Started
 
