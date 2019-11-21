@@ -1,6 +1,8 @@
 # Diplomka
 
-One Paragraph of project description goes here
+This project is for retraining mobile object detection architectures such as mobilenets on a custom dataset. Included scripts makes it easy to prepare datasets with different image resolutions, number of samples and various samples types(day, night, both).
+
+
 
 ## Getting Started
 
@@ -8,10 +10,11 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+Prerequisites for running are 
 
 ```
-Give examples
+Tensorflow Object Detection API
+ffmpeg
 ```
 
 ### Installing
