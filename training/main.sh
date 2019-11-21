@@ -3,7 +3,7 @@
 # Exit script on error.
 set -e
 # Echo each command, easier for debugging.
-set -x
+# set -x
 
 # keep only tensorboard data
 delete_train_files(){   
@@ -32,8 +32,43 @@ copy_model_into_obj_api(){
     cp "${ARCHITECTURE_DIR}/model.ckpt.meta" "model.ckpt.meta" 
 }
 
+
+usage(){
+    echo "Usage: sysinfo_page [[-d name of dataset (from {Local_git}/dataset/exported ) ], [-s number of training steps]]"
+    exit
+}
+
+# 0. parse arguments
+if [ "$1" = "" ]; then usage; fi
+while [ "$1" != "" ]; do
+    case $1 in
+        -d | --dataset )           
+            shift
+            DATASET="${LOCAL_GIT}/dataset/exported/$1"
+            if ! [ -d "${DATASET}" ]; then 
+                echo "Dataset on path ${DATASET} doesn't exist." 
+                usage; 
+            fi
+            ;;
+        -s | --step ) 
+            shift 
+            re='^[0-9]+$'
+            if ! [[ $1 =~ $re ]]; then
+                echo "Steps is not a number."
+                usage
+            fi  
+            num_training_steps="$1"
+            ;;
+        -h | --help )           
+            usage
+            ;;
+        * )                     
+            usage
+    esac
+    shift
+done
+
 # set variables 
-DATASET="batch_1_day"
 INPUT_TENSORS='normalized_input_image_tensor'
 OUTPUT_TENSORS='TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3'
 
@@ -45,7 +80,7 @@ for CKPT_DIR in ~/diplomka/training/configs/configs_to_process/*/ ; do
 
     echo "CONVERTING dataset to TF Record..."
     python object_detection/dataset_tools/create_pet_tf_record2.py \
-        --data_dir="${LOCAL_GIT}/dataset/exported/${DATASET}" \
+        --data_dir="${DATASET}" \
         --output_dir="${LOCAL_GIT}/dataset/exported/tf_records"
 
     echo "tf records done"
@@ -61,14 +96,11 @@ for CKPT_DIR in ~/diplomka/training/configs/configs_to_process/*/ ; do
 
     TRAIN_DIR="${OUTPUT_I}/train"
     echo "Start training..."
-    num_training_steps=11000
-    num_eval_steps=2000
     python object_detection/model_main.py \
         --pipeline_config_path="${CKPT_DIR}/pipeline.config" \
         --model_dir="${TRAIN_DIR}" \
-        --num_train_steps="${num_training_steps}" \
-        --num_eval_steps="${num_eval_steps}"
-
+        --num_train_steps="${num_training_steps}"
+        #--num_eval_steps="1000"
 
 
 

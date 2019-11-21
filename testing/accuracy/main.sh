@@ -46,6 +46,7 @@ done
 HEIGHT=$(cat "${MODEL_DIR}/output_tflite_graph_edgetpu.log" | grep "height:" | sed "s/[a-z]*://g")
 WIDTH=$(cat "${MODEL_DIR}/output_tflite_graph_edgetpu.log" | grep "width:" | sed "s/[a-z]*://g")
 TESTING_DIR=$(echo "${LOCAL_GIT}/testing/exported/${TYPE}_${WIDTH}x${HEIGHT}" | sed 's/ //g')
+ORIGIN=$(cat "${MODEL_DIR}/output_tflite_graph_edgetpu.log" | grep "origin:" | sed "s/[a-z]*://g" | sed 's/ //g')
 
 
 
@@ -60,10 +61,18 @@ fi
 
 
 # 3. generate model results
+echo "Generating model results..."
 python generate_model_results.py \
     --model_path="${MODEL_DIR}/output_tflite_graph_edgetpu.tflite" \
-    --testing_data="${TESTING_DIR}"
+    --testing_data="${TESTING_DIR}" \
+    --origin="${ORIGIN}"
 
 
+echo "${TESTING_DIR}"
 # 4. evaluate model results
-python evaluate_results.py
+echo "Evaluating model results..."
+python evaluate_results.py \
+    --ground_truth="${TESTING_DIR}"
+
+
+rm -rf "${PROJECT_ROOT}/testing/accuracy/model_detection_txts"
