@@ -43,7 +43,7 @@ def parse_xml_to_dict(xml_path):
     with tf.gfile.GFile(xml_path, 'r') as fid:
         xml_str = fid.read()
     xml = etree.fromstring(xml_str)
-    return recursive_parse_xml_to_dict(xml)
+    return recursive_parse_xml_to_dict(xml)['annotation']
 
 
 

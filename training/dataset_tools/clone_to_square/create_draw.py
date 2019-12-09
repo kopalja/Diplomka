@@ -56,7 +56,6 @@ if __name__ == "__main__":
     if not os.path.isdir(xmls_folder):
         xmls_folder = os.path.join(args.root, 'annotations', 'xmls')
 
-
     images_name = sorted([f for f in listdir(images_folder) if isfile(join(images_folder, f))])
 
     for image_name in images_name:
@@ -64,7 +63,7 @@ if __name__ == "__main__":
         xml_path = os.path.join(xmls_folder, image_name[:-4] + '.xml')
 
         #print(xml_path)
-        data = parse_xml_to_dict(xml_path)  
+        data = parse_xml_to_dict(xml_path)
         draw = draw_boxes(Image.open(image_path), data)
         dest_draw_path = os.path.join(draw_folder, image_name)
         draw.save(dest_draw_path, "JPEG")
