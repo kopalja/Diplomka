@@ -14,38 +14,15 @@ usage()
     , [-s weaher use square images]"
     exit
 }
-cd "${PROJECT_ROOT}/training/dataset_tools/export"
+cd "${PROJECT_ROOT}/training/dataset_tools/export/clone_to_square"
 
 SQUARE=false
 # parse arguments
 while [ "$1" != "" ]; do
     case $1 in
-        -n | --name )           
+        -f | --from )           
             shift
-            NAME=$1
-            ;;
-        # test type
-        -t | --type ) 
-            shift 
-            if [ "$1" != "all" ] && [ "$1" != "day" ] && [ "$1" != "night" ]; then
-                usage
-            fi  
-            TYPE=$1
-            ;;
-        # parse batches into array
-        -b | --batch ) 
-            shift   
-            i=0
-            for batch in $1
-            do
-                BATCH[$i]=${batch}
-                #echo "${BATCH[$i]}"  
-                ((i++))
-            done
-            ;;
-        # square image
-        -s | --square )
-            SQUARE=true
+            FROM=$1
             ;;
         -h | --help )           
             usage
@@ -56,32 +33,44 @@ while [ "$1" != "" ]; do
     shift
 done
 
+if [ "${FROM}" == "" ]; then
+    usage
+fi
 
-PROCESSED_DIR="${LOCAL_GIT}/dataset/processed"
-EXPORTED_DIR="${LOCAL_GIT}/dataset/exported"
+
+
+PROCESSED_DIR="${LOCAL_GIT}/dataset/processed/${FROM}"
+EXPORTED_DIR="${LOCAL_GIT}/dataset/processed/${FROM}_square"
+
 
 # Create new empty dataset
-if [ -d "${EXPORTED_DIR}/${NAME}" ]; then rm -Rf ${EXPORTED_DIR}/${NAME}; fi
-mkdir "${EXPORTED_DIR}/${NAME}"
-mkdir "${EXPORTED_DIR}/${NAME}/images"
-mkdir "${EXPORTED_DIR}/${NAME}/draw"
-mkdir "${EXPORTED_DIR}/${NAME}/annotations"
-mkdir "${EXPORTED_DIR}/${NAME}/annotations/xmls"
+if [ -d "${EXPORTED_DIR}" ]; then rm -Rf "${EXPORTED_DIR}"; fi
+mkdir "${EXPORTED_DIR}"
+mkdir "${EXPORTED_DIR}/day"
+mkdir "${EXPORTED_DIR}/night"
+mkdir "${EXPORTED_DIR}/day/draw"
+mkdir "${EXPORTED_DIR}/day/images"
+mkdir "${EXPORTED_DIR}/day/xmls"
+mkdir "${EXPORTED_DIR}/night/draw"
+mkdir "${EXPORTED_DIR}/night/images"
+mkdir "${EXPORTED_DIR}/night/xmls"
+
+# # Create new empty dataset
+# if [ -d "${EXPORTED_DIR}/${NAME}" ]; then rm -Rf ${EXPORTED_DIR}/${NAME}; fi
+# mkdir "${EXPORTED_DIR}/${NAME}"
+# mkdir "${EXPORTED_DIR}/${NAME}/images"
+# mkdir "${EXPORTED_DIR}/${NAME}/draw"
+# mkdir "${EXPORTED_DIR}/${NAME}/annotations"
+# mkdir "${EXPORTED_DIR}/${NAME}/annotations/xmls"
+
+echo "Cloning ..."
+python clone_rectangle.py --ffrom="${PROCESSED_DIR}" --to="${EXPORTED_DIR}"
 
 
+echo "Drawing day ... "
+python create_draw.py --root "${EXPORTED_DIR}/day"
+echo "Drawing night ... "
+python create_draw.py --root "${EXPORTED_DIR}/night"
 
 
-
-echo "Creating dataset..."
-for batch in "${BATCH[@]}"
-do
-    python merge_to_export.py --processed="${PROCESSED_DIR}/${batch}" --exported="${EXPORTED_DIR}/${NAME}" --type="${TYPE}" --square="${SQUARE}"
-done
-
-
-
-python create_draw.py --root "${EXPORTED_DIR}/${NAME}"
-
-
-ls "${EXPORTED_DIR}/${NAME}/images" > "${EXPORTED_DIR}/${NAME}/annotations/trainval.txt"
 echo "Done"
